@@ -1,0 +1,22 @@
+{
+  "name": "electron-chat-app-demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rossicler/electron-chat-app-demo.git"
+  },
+  "author": "Rossicler Junior",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rossicler/electron-chat-app-demo/issues"
+  },
+  "homepage": "https://github.com/rossicler/electron-chat-app-demo#readme",
+  "devDependencies": {
+    "electron": "^23.1.1"
+  }
+}
