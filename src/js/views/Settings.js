@@ -1,4 +1,5 @@
 import React from "react";
+import { withBaseLayout } from "../layouts/Base";
 
 const Settings = () => {
   return (
@@ -43,4 +44,4 @@ const Settings = () => {
   );
 };
 
-export default Settings;
+export default withBaseLayout(Settings, { canGoBack: true });

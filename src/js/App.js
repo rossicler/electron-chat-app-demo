@@ -1,44 +1,91 @@
 import React, { useEffect } from "react";
-import { Provider } from "react-redux";
-import { HashRouter as Router, Switch, Route } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  HashRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+} from "react-router-dom";
 
 import Home from "./views/Home";
 import Welcome from "./views/Welcome";
 import Settings from "./views/Settings";
 import Chat from "./views/Chat";
-import Navbar from "./components/Navbar";
+import LoadingView from "./components/shared/LoadingView";
 
-import configureStore from "./store";
+import StoreProvider from "./store/StoreProvider";
 import { listenToAuthChanges } from "./actions/auth";
+import { listenToConnectionChanges } from "./actions/app";
 
-const store = configureStore();
-
-export default function App() {
-  useEffect(() => {
-    store.dispatch(listenToAuthChanges());
-  }, []);
+const AuthRoute = ({ children, ...rest }) => {
+  const user = useSelector((state) => state.auth.user);
+  const onlyChild = React.Children.only(children);
 
   return (
-    <Provider store={store}>
-      <Router>
-        <Navbar />
-        <div className="content-wrapper">
-          <Switch>
-            <Route path="/" exact>
-              <Welcome />
-            </Route>
-            <Route path="/settings">
-              <Settings />
-            </Route>
-            <Route path="/chat/:id">
-              <Chat />
-            </Route>
-            <Route path="/home">
-              <Home />
-            </Route>
-          </Switch>
-        </div>
-      </Router>
-    </Provider>
+    <Route
+      {...rest}
+      render={(props) =>
+        user ? (
+          React.cloneElement(onlyChild, { ...rest, ...props })
+        ) : (
+          <Redirect to="/" />
+        )
+      }
+    />
+  );
+};
+
+const ChatApp = () => {
+  const dispatch = useDispatch();
+  const isChecking = useSelector((state) => state.auth.isChecking);
+  const isOnline = useSelector((state) => state.app.isOnline);
+
+  useEffect(() => {
+    const unsubFromAuth = dispatch(listenToAuthChanges());
+    const unsubFromConnection = dispatch(listenToConnectionChanges());
+
+    return () => {
+      unsubFromAuth();
+      unsubFromConnection();
+    };
+  }, [dispatch]);
+
+  if (!isOnline) {
+    return (
+      <LoadingView message="Application has been disconnected from the internet. Please reconnect..." />
+    );
+  }
+
+  if (isChecking) {
+    return <LoadingView />;
+  }
+
+  return (
+    <Router>
+      <div className="content-wrapper">
+        <Switch>
+          <Route path="/" exact>
+            <Welcome />
+          </Route>
+          <AuthRoute path="/settings">
+            <Settings />
+          </AuthRoute>
+          <AuthRoute path="/chat/:id">
+            <Chat />
+          </AuthRoute>
+          <AuthRoute path="/home">
+            <Home />
+          </AuthRoute>
+        </Switch>
+      </div>
+    </Router>
+  );
+};
+
+export default function App() {
+  return (
+    <StoreProvider>
+      <ChatApp />
+    </StoreProvider>
   );
 }

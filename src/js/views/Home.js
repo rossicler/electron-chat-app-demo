@@ -5,14 +5,17 @@ import AvailableChatsList from "../components/AvailableChatsList";
 import ViewTitle from "../components/shared/ViewTitle";
 import { fetchChats } from "../actions/chats";
 import { useDispatch, useSelector } from "react-redux";
+import { withBaseLayout } from "../layouts/Base";
+import Notification from "../utils/notifications";
 
 const Home = () => {
   const dispatch = useDispatch();
   const chats = useSelector((state) => state.chats.items);
 
   useEffect(() => {
+    Notification.setup();
     dispatch(fetchChats());
-  }, []);
+  }, [dispatch]);
 
   return (
     <div className="row no-gutters fh">
@@ -27,4 +30,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default withBaseLayout(Home);
