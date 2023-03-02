@@ -4,7 +4,8 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "watch": "webpack --config webpack.common.js --watch"
   },
   "repository": {
     "type": "git",
@@ -17,6 +18,29 @@
   },
   "homepage": "https://github.com/rossicler/electron-chat-app-demo#readme",
   "devDependencies": {
-    "electron": "^23.1.1"
+    "dotenv-webpack": "^8.0.1",
+    "electron": "^23.1.1",
+    "electron-reload": "^2.0.0-alpha.1"
+  },
+  "dependencies": {
+    "@babel/core": "^7.21.0",
+    "@babel/preset-env": "^7.20.2",
+    "@babel/preset-react": "^7.18.6",
+    "@reduxjs/toolkit": "^1.9.3",
+    "babel-loader": "^9.1.2",
+    "bootstrap": "4.5.2",
+    "css-loader": "^6.7.3",
+    "firebase": "^7.19.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.43.3",
+    "react-redux": "^8.0.5",
+    "react-router-dom": "^5.2.0",
+    "redux-thunk": "^2.4.2",
+    "sass": "^1.58.3",
+    "sass-loader": "^13.2.0",
+    "style-loader": "^3.3.1",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1"
   }
 }
