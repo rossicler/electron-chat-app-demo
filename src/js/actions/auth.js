@@ -22,13 +22,17 @@ export const loginUser = (formData) => (dispatch) => {
 };
 
 export const logout = () => (dispatch) =>
-  api.logout().then((_) => dispatch({ type: "AUTH_LOGOUT_SUCCESS" }));
+  api.logout().then((_) => {
+    dispatch({ type: "AUTH_LOGOUT_SUCCESS" });
+    dispatch({ type: "CHATS_FETCH_RESTART" });
+  });
 
 export const listenToAuthChanges = () => (dispatch) => {
   dispatch({ type: "AUTH_ON_INIT" });
   return api.onAuthStateChanged(async (authUser) => {
     if (authUser) {
       const userProfile = await api.getUserProfile(authUser.uid);
+      userProfile.joinedChats = userProfile.joinedChats.map((chat) => chat.id);
       dispatch({
         type: "AUTH_ON_SUCCESS",
         user: userProfile,
