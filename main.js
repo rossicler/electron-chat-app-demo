@@ -1,5 +1,5 @@
 // Main process
-const { app, BrowserWindow, ipcMain, Notification } = require("electron");
+const { app, BrowserWindow, ipcMain, Notification, Menu } = require("electron");
 const path = require("path");
 const isDev = !app.isPackaged;
 
@@ -8,7 +8,7 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 1200,
     height: 800,
-    backgroundColor: "white",
+    backgroundColor: "#6e707e",
     webPreferences: {
       nodeIntegration: false,
       // is a feature that ensures that both, your preload scripts and Electron
@@ -28,7 +28,12 @@ if (isDev) {
   });
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then((_) => {
+  const template = require("./utils/Menu").createTemplate(app);
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
+  createWindow();
+});
 
 ipcMain.on("notify", (_, message) => {
   new Notification({ title: "Notification", body: message }).show();
