@@ -6,14 +6,24 @@ import ChatUsersList from "../components/ChatUsersList";
 import ChatMessagesList from "../components/ChatMessagesList";
 import { withBaseLayout } from "../layouts/Base";
 import { useDispatch, useSelector } from "react-redux";
-import { subscribeToChat, subscribeToProfile } from "../actions/chats";
+import {
+  registerMessageSubscription,
+  sendChatMessaage,
+  subscribeToChat,
+  subscribeToMessages,
+  subscribeToProfile,
+} from "../actions/chats";
 import LoadingView from "../components/shared/LoadingView";
+import Messanger from "../components/Messanger";
 
 const Chat = () => {
   const { id } = useParams();
   const peopleWatchers = useRef({});
+  const messageListRef = useRef();
   const dispatch = useDispatch();
   const activeChat = useSelector((state) => state.chats.activeChats[id]);
+  const messages = useSelector((state) => state.chats.messages[id]);
+  const messagesSub = useSelector((state) => state.chats.messagesSubs[id]);
   const joinedUsers = activeChat?.joinedUsers;
 
   const subscibeToJoinedUsers = useCallback(
@@ -34,8 +44,25 @@ const Chat = () => {
     );
   }, [peopleWatchers.current]);
 
+  const sendMessage = useCallback(
+    (message) => {
+      dispatch(sendChatMessaage(message, id)).then((_) => {
+        messageListRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "end",
+        });
+      });
+    },
+    [id]
+  );
+
   useEffect(() => {
     const unsubFromChat = dispatch(subscribeToChat(id));
+
+    if (!messagesSub) {
+      const unsubFromMessages = dispatch(subscribeToMessages(id));
+      dispatch(registerMessageSubscription(id, unsubFromMessages));
+    }
 
     return () => {
       unsubFromChat();
@@ -61,7 +88,8 @@ const Chat = () => {
       </div>
       <div className="col-9 fh">
         <ViewTitle text={`Channel: ${activeChat?.name}`} />
-        <ChatMessagesList />
+        <ChatMessagesList ref={messageListRef} messages={messages} />
+        <Messanger onSubmit={sendMessage} />
       </div>
     </div>
   );

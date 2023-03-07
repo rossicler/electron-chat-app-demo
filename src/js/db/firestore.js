@@ -1,5 +1,5 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
+import { initializeApp, firestore } from "firebase/app";
 import "firebase/firestore";
 // import { getAnalytics } from "firebase/analytics";
 // TODO: Add SDKs for Firebase products that you want to use
@@ -17,6 +17,8 @@ const firebaseConfig = {
   measurementId: process.env.FIREBASE_MEASUREMENT_ID,
   databaseURL: process.env.FIREBASE_DATABASE_URL,
 };
+
+export const { Timestamp } = firestore;
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);

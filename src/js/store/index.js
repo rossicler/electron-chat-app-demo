@@ -7,12 +7,21 @@ import appReducer from "../reducers/app";
 import appMiddleware from "./middlewares/app";
 
 export default () => {
+  const mainReducer = combineReducers({
+    chats: chatReducer,
+    auth: authReducer,
+    app: appReducer,
+  });
+
+  const rootReducer = (state, action) => {
+    if (action.type === "AUTH_LOGOUT_SUCCESS") {
+      state = undefined;
+    }
+    return mainReducer(state, action);
+  };
+
   const store = configureStore({
-    reducer: combineReducers({
-      chats: chatReducer,
-      auth: authReducer,
-      app: appReducer,
-    }),
+    reducer: rootReducer,
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
         serializableCheck: false,
