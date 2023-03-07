@@ -17,6 +17,7 @@ import StoreProvider from "./store/StoreProvider";
 import { listenToAuthChanges } from "./actions/auth";
 import { listenToConnectionChanges } from "./actions/app";
 import ChatCreate from "./views/ChatCreate";
+import { checkUserConnection } from "./actions/connection";
 
 const AuthRoute = ({ children, ...rest }) => {
   const user = useSelector((state) => state.auth.user);
@@ -40,6 +41,7 @@ const ChatApp = () => {
   const dispatch = useDispatch();
   const isChecking = useSelector((state) => state.auth.isChecking);
   const isOnline = useSelector((state) => state.app.isOnline);
+  const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
     const unsubFromAuth = dispatch(listenToAuthChanges());
@@ -50,6 +52,17 @@ const ChatApp = () => {
       unsubFromConnection();
     };
   }, [dispatch]);
+
+  useEffect(() => {
+    let unsubFromUserConnection;
+    if (user?.uid) {
+      unsubFromUserConnection = dispatch(checkUserConnection(user.uid));
+    }
+
+    return () => {
+      if (unsubFromUserConnection) unsubFromUserConnection();
+    };
+  }, [dispatch, user]);
 
   if (!isOnline) {
     return (
