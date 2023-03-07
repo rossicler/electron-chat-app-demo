@@ -18,6 +18,7 @@ import { listenToAuthChanges } from "./actions/auth";
 import { listenToConnectionChanges } from "./actions/app";
 import ChatCreate from "./views/ChatCreate";
 import { checkUserConnection } from "./actions/connection";
+import { loadInitialSettings } from "./actions/settings";
 
 const AuthRoute = ({ children, ...rest }) => {
   const user = useSelector((state) => state.auth.user);
@@ -37,6 +38,15 @@ const AuthRoute = ({ children, ...rest }) => {
   );
 };
 
+const ContentWrapper = ({ children }) => {
+  const isDarkTheme = useSelector((state) => state.settings.isDarkTheme);
+  return (
+    <div className={`content-wrapper ${isDarkTheme ? "dark" : "light"}`}>
+      {children}
+    </div>
+  );
+};
+
 const ChatApp = () => {
   const dispatch = useDispatch();
   const isChecking = useSelector((state) => state.auth.isChecking);
@@ -44,6 +54,7 @@ const ChatApp = () => {
   const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
+    dispatch(loadInitialSettings());
     const unsubFromAuth = dispatch(listenToAuthChanges());
     const unsubFromConnection = dispatch(listenToConnectionChanges());
 
@@ -76,7 +87,7 @@ const ChatApp = () => {
 
   return (
     <Router>
-      <div className="content-wrapper">
+      <ContentWrapper>
         <Switch>
           <Route path="/" exact>
             <Welcome />
@@ -94,7 +105,7 @@ const ChatApp = () => {
             <ChatCreate />
           </AuthRoute>
         </Switch>
-      </div>
+      </ContentWrapper>
     </Router>
   );
 };
