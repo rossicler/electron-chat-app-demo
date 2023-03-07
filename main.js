@@ -1,7 +1,37 @@
 // Main process
-const { app, BrowserWindow, ipcMain, Notification, Menu } = require("electron");
+const {
+  app,
+  BrowserWindow,
+  ipcMain,
+  Notification,
+  Menu,
+  Tray,
+} = require("electron");
 const path = require("path");
 const isDev = !app.isPackaged;
+
+const dockIcon = path.join(__dirname, "assets/images/react_app_logo.png");
+const trayIcon = path.join(__dirname, "assets/images/react_icon.png");
+
+function createSplashWindow() {
+  // Browser window <- Renderer process
+  const win = new BrowserWindow({
+    width: 400,
+    height: 200,
+    frame: false,
+    transparent: true,
+    webPreferences: {
+      nodeIntegration: false,
+      // is a feature that ensures that both, your preload scripts and Electron
+      // internal logic run in separate contexts
+      contextIsolation: true,
+    },
+  });
+
+  win.loadFile("splash.html");
+
+  return win;
+}
 
 function createWindow() {
   // Browser window <- Renderer process
@@ -9,6 +39,7 @@ function createWindow() {
     width: 1200,
     height: 800,
     backgroundColor: "#6e707e",
+    show: false,
     webPreferences: {
       nodeIntegration: false,
       // is a feature that ensures that both, your preload scripts and Electron
@@ -20,6 +51,8 @@ function createWindow() {
 
   win.loadFile("index.html");
   if (isDev) win.webContents.openDevTools();
+
+  return win;
 }
 
 if (isDev) {
@@ -28,11 +61,28 @@ if (isDev) {
   });
 }
 
+if (process.platform === "darwin") {
+  app.dock.setIcon(dockIcon);
+}
+
+let tray = null;
 app.whenReady().then((_) => {
   const template = require("./utils/Menu").createTemplate(app);
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
-  createWindow();
+
+  tray = new Tray(trayIcon);
+  tray.setContextMenu(menu);
+
+  const splash = createSplashWindow();
+  const mainApp = createWindow();
+
+  mainApp.on("ready-to-show", () => {
+    setTimeout(() => {
+      splash.destroy();
+      mainApp.show();
+    }, 1000);
+  });
 });
 
 ipcMain.on("notify", (_, message) => {
