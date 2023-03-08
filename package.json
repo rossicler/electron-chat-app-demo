@@ -5,7 +5,13 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "watch": "webpack --config webpack.common.js --watch"
+    "watch": "webpack --config webpack.common.js --watch",
+    "build": "webpack --config webpack.prod.js",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "make:linux": "electron-builder --linux",
+    "make:macos": "electron-builder --mac",
+    "make:win": "electron-builder --win --x64"
   },
   "repository": {
     "type": "git",
@@ -13,6 +19,54 @@
   },
   "author": "Rossicler Junior",
   "license": "ISC",
+  "build": {
+    "productName": "Chat App",
+    "appId": "com.junior.chatapp",
+    "files": [
+      "build/**/*",
+      "assets/**/*",
+      "utils/**/*",
+      "index.html",
+      "splash.html",
+      "splash.css",
+      "main.js",
+      "preload.js"
+    ],
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "icon": "assets/images/react_app_logo.png",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 430,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "win": {
+      "icon": "assets/images/react_app_logo.png",
+      "target": [
+        "nsis"
+      ]
+    },
+    "linux": {
+      "target": [
+        "deb",
+        "rpm",
+        "AppImage"
+      ],
+      "category": "Development"
+    }
+  },
   "bugs": {
     "url": "https://github.com/rossicler/electron-chat-app-demo/issues"
   },
@@ -20,7 +74,9 @@
   "devDependencies": {
     "dotenv-webpack": "^8.0.1",
     "electron": "^23.1.1",
-    "electron-reload": "^2.0.0-alpha.1"
+    "electron-builder": "^23.6.0",
+    "electron-reload": "^2.0.0-alpha.1",
+    "webpack-merge": "^5.8.0"
   },
   "dependencies": {
     "@babel/core": "^7.21.0",
